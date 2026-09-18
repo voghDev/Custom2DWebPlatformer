@@ -4,6 +4,10 @@ This project is a simple 2D platform game playable locally from the web browser.
 
 You can select your character and customize its face and aspect with the files found inside `characters/` folder.
 
+<img width="793" height="444" alt="Captura de pantalla 2026-09-17 a las 16 26 58" src="https://github.com/user-attachments/assets/35aba2a5-5eb1-458a-b1f2-79313c98da9f" />
+
+<img width="791" height="440" alt="Captura de pantalla 2026-09-18 a las 13 34 03" src="https://github.com/user-attachments/assets/05ad1551-f1d4-4276-af5f-291879e5dceb" />
+
 ## How to run
 
 The game is plain HTML + JavaScript + Phaser (loaded from a CDN). There is no build step, but you do need to serve the files over HTTP — opening `index.html` directly with `file://` won't work because browsers block ES modules and `fetch()` on local files.
