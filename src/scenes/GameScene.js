@@ -9,12 +9,14 @@ export default class GameScene extends Phaser.Scene {
 
   init(data) {
     this.characterKey = (data && data.character) || 'male';
+    this.characterFile = (data && data.characterFile) || `${this.characterKey}.png`;
     this.finished = false;
   }
 
   preload() {
-    this.load.image('male', 'characters/male.png');
-    this.load.image('female', 'characters/female.png');
+    if (!this.textures.exists(this.characterKey)) {
+      this.load.image(this.characterKey, `characters/${this.characterFile}`);
+    }
     this.load.text('level-01', 'levels/level-01.txt');
   }
 
