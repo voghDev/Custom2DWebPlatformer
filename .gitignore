@@ -102,9 +102,6 @@ characters/*
 !characters/male.png
 !characters/female.png
 
-# Ignore any character-*.png files anywhere in the repo
-character-*.png
-
 # Phaser / asset pipeline intermediates
 # Uncomment if you generate atlases, spritesheets, or audio sprites locally
 # assets/atlas/*.generated.*
