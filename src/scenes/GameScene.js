@@ -10,6 +10,7 @@ export default class GameScene extends Phaser.Scene {
   init(data) {
     this.characterKey = (data && data.character) || 'male';
     this.characterFile = (data && data.characterFile) || `${this.characterKey}.png`;
+    this.levelKey = (data && data.level) || 'level-01';
     this.finished = false;
   }
 
@@ -17,13 +18,14 @@ export default class GameScene extends Phaser.Scene {
     if (!this.textures.exists(this.characterKey)) {
       this.load.image(this.characterKey, `characters/${this.characterFile}`);
     }
-    this.load.text('level-01', 'levels/level-01.txt');
+    this.load.text(this.levelKey, `levels/${this.levelKey}.txt`);
   }
 
   create() {
     buildProceduralTextures(this);
 
-    const level = parseLevel(this.cache.text.get('level-01'));
+    const level = parseLevel(this.cache.text.get(this.levelKey));
+    this.levelMeta = level.meta;
     const worldWidth = Math.max(level.width * TILE, this.scale.width);
     const worldHeight = level.height * TILE;
 
@@ -119,7 +121,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     if (this.player.y > this.worldBottom + 80) {
-      this.scene.restart({ character: this.characterKey });
+      this.scene.restart({ character: this.characterKey, level: this.levelKey });
       return;
     }
 
@@ -146,7 +148,7 @@ export default class GameScene extends Phaser.Scene {
       enemy.destroy();
       player.setVelocityY(-260);
     } else {
-      this.scene.restart({ character: this.characterKey });
+      this.scene.restart({ character: this.characterKey, level: this.levelKey });
     }
   }
 
@@ -155,8 +157,9 @@ export default class GameScene extends Phaser.Scene {
     this.finished = true;
     this.player.setVelocity(0, 0);
 
+    const next = this.levelMeta && this.levelMeta.next;
     const cam = this.cameras.main;
-    this.add.text(cam.width / 2, cam.height / 2, 'LEVEL COMPLETE!', {
+    this.add.text(cam.width / 2, cam.height / 2, next ? 'LEVEL COMPLETE!' : 'GAME COMPLETE!', {
       fontFamily: 'monospace',
       fontSize: '48px',
       color: '#ffd700',
@@ -164,7 +167,13 @@ export default class GameScene extends Phaser.Scene {
       strokeThickness: 6,
     }).setOrigin(0.5).setScrollFactor(0);
 
-    this.time.delayedCall(2500, () => this.scene.start('MenuScene'));
+    this.time.delayedCall(2500, () => {
+      if (next) {
+        this.scene.start('GameScene', { character: this.characterKey, level: next });
+      } else {
+        this.scene.start('MenuScene');
+      }
+    });
   }
 }
 
