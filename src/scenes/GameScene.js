@@ -128,8 +128,8 @@ export default class GameScene extends Phaser.Scene {
       this.player.setVelocityY(-450);
     }
 
-    if (this.player.y > this.worldBottom + 80) {
-      this.die({ fromPit: true });
+    if (this.player.y > this.worldBottom + 20) {
+      this.die();
       return;
     }
 
@@ -157,19 +157,17 @@ export default class GameScene extends Phaser.Scene {
       enemy.destroy();
       player.setVelocityY(-260);
     } else {
-      this.die({ fromPit: false });
+      this.die();
     }
   }
 
-  die({ fromPit }) {
+  die() {
     if (this.dying) return;
     this.dying = true;
     this.player.setVelocityX(0);
     this.player.body.checkCollision.none = true;
     this.player.setFlipY(true);
-    if (!fromPit) {
-      this.player.setVelocityY(-400);
-    }
+    this.player.setVelocityY(-400);
     this.time.delayedCall(1500, () => {
       this.scene.restart({ character: this.characterKey, level: this.levelKey });
     });
