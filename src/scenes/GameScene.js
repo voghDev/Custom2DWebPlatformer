@@ -12,6 +12,7 @@ export default class GameScene extends Phaser.Scene {
     this.characterFile = (data && data.characterFile) || `${this.characterKey}.png`;
     this.levelKey = (data && data.level) || 'level-01';
     this.finished = false;
+    this.dying = false;
   }
 
   preload() {
@@ -100,6 +101,13 @@ export default class GameScene extends Phaser.Scene {
   update() {
     if (this.finished) return;
 
+    if (this.dying) {
+      this.enemies.children.iterate(en => {
+        if (en && en.active && en.y > this.worldBottom + 40) en.destroy();
+      });
+      return;
+    }
+
     const left = this.cursors.left.isDown || this.wasd.A.isDown;
     const right = this.cursors.right.isDown || this.wasd.D.isDown;
     const jump = this.cursors.up.isDown || this.cursors.space.isDown ||
@@ -120,8 +128,8 @@ export default class GameScene extends Phaser.Scene {
       this.player.setVelocityY(-450);
     }
 
-    if (this.player.y > this.worldBottom + 80) {
-      this.scene.restart({ character: this.characterKey, level: this.levelKey });
+    if (this.player.y > this.worldBottom + 20) {
+      this.die();
       return;
     }
 
@@ -142,14 +150,27 @@ export default class GameScene extends Phaser.Scene {
   }
 
   onEnemyHit(player, enemy) {
+    if (this.dying) return;
     const stomping = player.body.velocity.y > 40 &&
                      player.body.bottom < enemy.body.top + 16;
     if (stomping) {
       enemy.destroy();
       player.setVelocityY(-260);
     } else {
-      this.scene.restart({ character: this.characterKey, level: this.levelKey });
+      this.die();
     }
+  }
+
+  die() {
+    if (this.dying) return;
+    this.dying = true;
+    this.player.setVelocityX(0);
+    this.player.body.checkCollision.none = true;
+    this.player.setFlipY(true);
+    this.player.setVelocityY(-400);
+    this.time.delayedCall(1500, () => {
+      this.scene.restart({ character: this.characterKey, level: this.levelKey });
+    });
   }
 
   onGoalReached() {
